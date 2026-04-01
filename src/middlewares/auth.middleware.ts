@@ -1,7 +1,7 @@
 import { verifyAccessToken } from "../utils/token";
 import { Request, Response, NextFunction } from "express";
 
-export const protect = (req: Request, res: Response, next: NextFunction) => {
+export const protect = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
         const token = req.cookies.accessToken;
@@ -14,8 +14,8 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
             });
         }
 
-        const decoded = verifyAccessToken(token);
-
+        const decoded = await verifyAccessToken(token);
+        console.log(decoded);
         req.user = decoded;
 
         next();

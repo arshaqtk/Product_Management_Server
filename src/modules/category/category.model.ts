@@ -10,7 +10,7 @@ const categorySchema = new Schema<ICategory>(
     name: {
       type: String,
       required: true,
-      unique: true,
+      unique: true, 
       trim: true
     },
     subcategories: [
@@ -22,5 +22,4 @@ const categorySchema = new Schema<ICategory>(
   },
   { timestamps: true }
 );
-categorySchema.index({ name: 1 });
 export const Category = mongoose.model<ICategory>("Category", categorySchema);

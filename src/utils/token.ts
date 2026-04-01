@@ -18,7 +18,7 @@ export const generateRefreshToken = (payload: JwtPayload):string => {
   });
 };
 
-// Verify Access Token
+// Verify Access Token 
 export const verifyAccessToken = (token: string):JwtPayload => {
   const decoded = jwt.verify(token, env.ACCESS_SECRET as string);
   return decoded as JwtPayload;

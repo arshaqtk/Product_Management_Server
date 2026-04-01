@@ -15,6 +15,19 @@ export const createCategory =asyncHandler( async (
     });}
 )
 
+export const createSubCategory =asyncHandler( async (
+  req: Request,
+  res: Response,
+) => { 
+    const category = await categoryService.createSubCategory(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: "SubCategory added successfully",
+      data: category
+    });}
+)
+
 export const getCategories =asyncHandler( async (
   req: Request,
   res: Response,
