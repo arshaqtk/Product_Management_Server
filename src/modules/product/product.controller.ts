@@ -38,6 +38,27 @@ export const getProducts = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+export const getProductById =asyncHandler(async (req: Request,res: Response) => {
+    const { id } = req.params;
+    const product = await productService.getProductById(id as string);
+
+    res.status(200).json({
+      success: true,
+      data: product
+    });
+})
+
+export const getVariantDetails = asyncHandler(async (req: Request, res: Response) => {
+  const { productId, ram } = req.params;
+
+  const details = await productService.getVariantDetails(productId as string, ram as string);
+
+  res.status(200).json({
+    success: true,
+    data: details
+  });
+});
+
 export const updateProduct = asyncHandler(async (req: Request, res: Response) => {
   const productId = req.params.id as string;
 

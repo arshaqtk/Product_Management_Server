@@ -56,3 +56,11 @@ export const refreshTokenService  = async (token:string)=>{
   const refreshToken = generateRefreshToken({ id: user._id.toString(),email:user.email});
   return { user, accessToken, refreshToken };
 }
+
+export const getMeService = async (userId: string) => {
+  const user = await User.findById(userId).select("-password");
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user;
+};

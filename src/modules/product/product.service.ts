@@ -69,19 +69,65 @@ export const getProducts = async (query: GetProductsQuery) => {
   const skip = (pageNum - 1) * limitNum;
 
   const [products, total] = await Promise.all([
-    Product.find(filter)
-      .skip(skip)
-      .limit(limitNum)
-      .sort({ createdAt: -1 })
-      .lean(),
-    Product.countDocuments(filter),
-  ]);
+  Product.find(filter)
+    .select("title categoryId subcategory images variants") 
+    .skip(skip)
+    .limit(limitNum)
+    .sort({ createdAt: -1 })
+    .lean(),
+  Product.countDocuments(filter),
+]);
+
+
+const formattedProducts = products.map((product) => {
+  const minPrice = Math.min(...product.variants.map(v => v.price));
 
   return {
-    products,
+    _id: product._id,
+    title: product.title,
+    categoryId: product.categoryId,
+    subcategory: product.subcategory,
+    image: product.images?.[0], // first image
+    price: minPrice
+  };
+});
+  return {
+    products:formattedProducts,
     total,
     page: pageNum,
     totalPages: Math.ceil(total / limitNum),
+  };
+};
+
+export const getProductById = async (id: string) => {
+  const product = await Product.findById(id).populate("categoryId", "name");
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  return product;
+};
+
+export const getVariantDetails = async (
+  productId: string,
+  ram: string
+) => {
+  const product = await Product.findById(productId).lean();
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  const variant = product.variants.find(v => v.ram === ram);
+
+  if (!variant) {
+    throw new Error("Variant not found");
+  }
+
+  return {
+    price: variant.price,
+    stock: variant.qty
   };
 };
 

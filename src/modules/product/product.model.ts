@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-interface IVariant {
+export interface IVariant {
   ram: string;
   price: number;
   qty: number;

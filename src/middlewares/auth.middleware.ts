@@ -15,7 +15,6 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
         }
 
         const decoded = await verifyAccessToken(token);
-        console.log(decoded);
         req.user = decoded;
 
         next();

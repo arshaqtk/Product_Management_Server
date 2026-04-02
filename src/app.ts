@@ -13,7 +13,7 @@ const app: Application = express();
 
 // Global Middlewares
 app.use(cors({
-  origin: "*",
+  origin:env.CLIENT_URL,
   credentials: true
 }));
 app.use(cookieParser());
