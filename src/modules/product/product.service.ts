@@ -47,17 +47,16 @@ if (existingProduct) {
 
 export const getProducts = async (query: GetProductsQuery) => {
   let { search, categoryId, subcategory, page = 1, limit = 10 } = query;
-console.log(query)
   // Normalize pagination
   const pageNum = Number(page) || 1;
   const limitNum = Number(limit) || 10;
 
   const filter: any = {};
 
-  // Search (case-insensitive)
-  if (search) {
-    filter.title = { $regex: search.trim(), $options: "i" };
-  }
+  
+ if (search) {
+   filter.title = { $regex: search.trim(), $options: "i" };
+}
 
   if (categoryId) {
     filter.categoryId = categoryId;
@@ -84,6 +83,36 @@ console.log(query)
     page: pageNum,
     totalPages: Math.ceil(total / limitNum),
   };
+};
+
+export const getProductSuggestions = async (q: string) => {
+  const keyword = q.trim();
+
+  return Product.aggregate([
+    {
+      $match: {
+        title: { $regex: keyword, $options: "i" },
+      },
+    },
+    {
+      $addFields: {
+        priority: {
+          $cond: [
+            { $regexMatch: { input: "$title", regex: `^${keyword}`, options: "i" } },
+            1,2,],
+        },
+      },
+    },
+    {
+      $sort: { priority: 1, createdAt: -1 },
+    },
+    {
+      $limit: 10,
+    },
+    {
+      $project: { title: 1 },
+    },
+  ]);
 };
 
 export const updateProduct = async (productId: string, data: any) => {

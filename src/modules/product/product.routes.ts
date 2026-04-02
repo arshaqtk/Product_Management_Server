@@ -14,6 +14,9 @@ router.post("/",protect, upload.array("images", 5),validate(createProductSchema)
 // Get all
 router.get("/", productController.getProducts);
 
+//Get suggestions
+router.get("/suggestions", productController.getProductSuggestions);
+
 //Update
 router.put("/:id",protect,validateObjectId("id"),upload.array("images", 5),validate(updateProductSchema),productController.updateProduct);
 

@@ -9,8 +9,14 @@ export const createProduct = asyncHandler(async (req: Request, res: Response) =>
 }
 
   const imageUrls = files?.map(file => file.path) || [];
-  if (req.body.variants) {
-    req.body.variants = JSON.parse(req.body.variants);
+  if (typeof req.body.variants === "string") {
+    try {
+      req.body.variants = JSON.parse(req.body.variants);
+    } catch (e) {
+      const error: any = new Error("Invalid variants format. Must be a valid JSON string.");
+      error.status = 400;
+      throw error;
+    }
   }
   const product = await productService.createProduct({
     ...req.body,
@@ -44,8 +50,14 @@ export const updateProduct = asyncHandler(async (req: Request, res: Response) =>
   }
 
 
-  if (req.body.variants) {
-    req.body.variants = JSON.parse(req.body.variants);
+  if (typeof req.body.variants === "string") {
+    try {
+      req.body.variants = JSON.parse(req.body.variants);
+    } catch (e) {
+      const error: any = new Error("Invalid variants format. Must be a valid JSON string.");
+      error.status = 400;
+      throw error;
+    }
   }
 
   const updatedProduct = await productService.updateProduct(productId, {
@@ -59,4 +71,17 @@ export const updateProduct = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
+
+export const getProductSuggestions = async (req: Request, res: Response) => {
+  const { q } = req.query;
+
+  if (!q || typeof q !== "string") {
+    return res.json([]);
+  }
+
+  const keyword = q.trim();
+
+  const suggestions = await productService.getProductSuggestions(keyword);
+  res.json(suggestions);
+};
 
