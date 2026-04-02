@@ -7,6 +7,7 @@ import { errorHandler } from "./middlewares/error.middleware";
 import authRoutes from "./modules/auth/auth.routes";
 import categoryRoutes from "./modules/category/category.routes";
 import productRoutes from "./modules/product/product.routes";
+import wishlistRoutes from "./modules/wishlist/wishlist.routes";
 
 const app: Application = express();
 
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 
 

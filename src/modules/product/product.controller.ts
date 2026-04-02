@@ -72,7 +72,7 @@ export const updateProduct = asyncHandler(async (req: Request, res: Response) =>
 });
 
 
-export const getProductSuggestions = async (req: Request, res: Response) => {
+export const getProductSuggestions = asyncHandler(async (req: Request, res: Response) => {
   const { q } = req.query;
 
   if (!q || typeof q !== "string") {
@@ -83,5 +83,5 @@ export const getProductSuggestions = async (req: Request, res: Response) => {
 
   const suggestions = await productService.getProductSuggestions(keyword);
   res.json(suggestions);
-};
+});
 
