@@ -63,7 +63,11 @@ export const getProducts = async (query: GetProductsQuery) => {
   }
 
   if (subcategory) {
-    filter.subcategory = subcategory.toLowerCase().trim();
+    if (Array.isArray(subcategory)) {
+      filter.subcategory = { $in: subcategory.map((s: string) => s.toLowerCase().trim()) };
+    } else {
+      filter.subcategory = subcategory.toLowerCase().trim();
+    }
   }
 
   const skip = (pageNum - 1) * limitNum;
@@ -107,28 +111,6 @@ export const getProductById = async (id: string) => {
   }
 
   return product;
-};
-
-export const getVariantDetails = async (
-  productId: string,
-  ram: string
-) => {
-  const product = await Product.findById(productId).lean();
-
-  if (!product) {
-    throw new Error("Product not found");
-  }
-
-  const variant = product.variants.find(v => v.ram === ram);
-
-  if (!variant) {
-    throw new Error("Variant not found");
-  }
-
-  return {
-    price: variant.price,
-    stock: variant.qty
-  };
 };
 
 export const getProductSuggestions = async (q: string) => {

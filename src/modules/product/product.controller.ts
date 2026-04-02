@@ -48,17 +48,6 @@ export const getProductById =asyncHandler(async (req: Request,res: Response) => 
     });
 })
 
-export const getVariantDetails = asyncHandler(async (req: Request, res: Response) => {
-  const { productId, ram } = req.params;
-
-  const details = await productService.getVariantDetails(productId as string, ram as string);
-
-  res.status(200).json({
-    success: true,
-    data: details
-  });
-});
-
 export const updateProduct = asyncHandler(async (req: Request, res: Response) => {
   const productId = req.params.id as string;
 

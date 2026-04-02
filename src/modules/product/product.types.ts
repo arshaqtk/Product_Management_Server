@@ -10,7 +10,7 @@ export interface CreateProductInput {
 export interface GetProductsQuery {
   search?: string;
   categoryId?: string;
-  subcategory?: string;
+  subcategory?: string | string[];
   page?: string | number;
   limit?: string | number;
 }

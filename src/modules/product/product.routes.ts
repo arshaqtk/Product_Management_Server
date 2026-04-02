@@ -16,8 +16,6 @@ router.get("/", productController.getProducts);
 
 router.get("/:id",validateObjectId("id"),productController.getProductById);
 
-router.get("/variant/:productId/:ram",validateObjectId("productId"),productController.getVariantDetails);
-
 //Get suggestions
 router.get("/suggestions", productController.getProductSuggestions);
 
