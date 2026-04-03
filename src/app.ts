@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { env } from "./config/env";
 import { errorHandler } from "./middlewares/error.middleware";
+import { globalRateLimiter } from "./middlewares/rateLimiter.middleware";
 import authRoutes from "./modules/auth/auth.routes";
 import categoryRoutes from "./modules/category/category.routes";
 import productRoutes from "./modules/product/product.routes";
@@ -27,6 +28,8 @@ if (env.NODE_ENV === "development") {
 app.get("/", (req, res) => {
   res.send("API is running ");
 });
+
+app.use("/api", globalRateLimiter);
 
 // Routes
 app.use("/api/auth", authRoutes);
