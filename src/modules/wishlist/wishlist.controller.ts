@@ -9,7 +9,7 @@ export const addToWishlist = asyncHandler(async (req: any, res: Response) => {
     if(!productId||!isValidObjectId(productId)){
       throw new Error("Product ID is required");
     }
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const wishlist = await wishlistService.addToWishlist(
       userId,
       productId
@@ -26,7 +26,7 @@ export const addToWishlist = asyncHandler(async (req: any, res: Response) => {
 export const removeFromWishlist = asyncHandler(async (req: any, res: Response) => {
 
     const { productId } = req.params;
-    const userId = req.user.userId;
+    const userId = req.user.id;
     const wishlist = await wishlistService.removeFromWishlist(
       userId,
       productId
@@ -42,7 +42,7 @@ export const removeFromWishlist = asyncHandler(async (req: any, res: Response) =
 
 export const getWishlist = asyncHandler(async (req: any, res: Response) => {
  
-    const wishlist = await wishlistService.getWishlist(req.user.userId);
+    const wishlist = await wishlistService.getWishlist(req.user.id);
 
     res.status(200).json({
       success: true,
