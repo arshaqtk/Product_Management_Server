@@ -52,11 +52,25 @@ export const updateProduct = asyncHandler(async (req: Request, res: Response) =>
   const productId = req.params.id as string;
 
   const files = req.files as Express.Multer.File[] | undefined;
+  const imageUrls = files?.map(file => file.path) || [];
 
-  let imageUrls: string[] | undefined;
+  let finalImages: string[] = [];
 
-  if (files && files.length > 0) {
-    imageUrls = files.map(file => file.path);
+  // Parse existing images if provided
+  if (req.body.existingImages) {
+    try {
+      finalImages = JSON.parse(req.body.existingImages);
+    } catch (e) {
+      finalImages = Array.isArray(req.body.existingImages) ? req.body.existingImages : [req.body.existingImages];
+    }
+  } else if (req.body.images) {
+    // Fallback if client is using standard images field
+    finalImages = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+  }
+
+  // Add new uploads
+  if (imageUrls.length > 0) {
+    finalImages = [...finalImages, ...imageUrls];
   }
 
 
@@ -72,7 +86,7 @@ export const updateProduct = asyncHandler(async (req: Request, res: Response) =>
 
   const updatedProduct = await productService.updateProduct(productId, {
     ...req.body,
-    ...(imageUrls && { images: imageUrls }),
+    images: finalImages,
   });
 
   res.status(200).json({
@@ -92,6 +106,9 @@ export const getProductSuggestions = asyncHandler(async (req: Request, res: Resp
   const keyword = q.trim();
 
   const suggestions = await productService.getProductSuggestions(keyword);
-  res.json(suggestions);
+  res.status(200).json({
+    success: true,
+    data: suggestions,
+  });
 });
 

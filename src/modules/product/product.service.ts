@@ -170,18 +170,31 @@ export const updateProduct = async (productId: string, data: any) => {
     }
   }
 
-  // Duplicate check (if title changed)
-  if (data.title) {
+  // Normalize subcategory for comparison
+  const normalizedSub = data.subcategory?.toLowerCase().trim() || product.subcategory;
+
+  // Duplicate check: Only run if title, category, or subcategory has changed
+  const hasUniquenessChanged = 
+    (data.title && data.title.trim().toLowerCase() !== product.title.toLowerCase()) ||
+    (data.categoryId && data.categoryId.toString() !== product.categoryId.toString()) ||
+    (data.subcategory && data.subcategory.toLowerCase().trim() !== product.subcategory.toLowerCase());
+
+  if (hasUniquenessChanged) {
     const existing = await Product.findOne({
       _id: { $ne: productId },
-      title: { $regex: `^${data.title.trim()}$`, $options: "i" },
+      title: { $regex: `^${(data.title || product.title).trim()}$`, $options: "i" },
       categoryId: data.categoryId || product.categoryId,
-      subcategory:data.subcategory.toLowerCase().trim()||product.subcategory,
+      subcategory: normalizedSub,
     });
 
     if (existing) {
-      throw new Error("Product with same title already exists");
+      throw new Error("A product with this title already exists in the selected category/subcategory");
     }
+  }
+
+  // Ensure subcategory is normalized before saving
+  if (data.subcategory) {
+    data.subcategory = data.subcategory.toLowerCase().trim();
   }
 
   // Update product

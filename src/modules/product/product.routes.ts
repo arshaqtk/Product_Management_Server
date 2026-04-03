@@ -14,10 +14,11 @@ router.post("/",protect, upload.array("images", 5),validate(createProductSchema)
 // Get all
 router.get("/", productController.getProducts);
 
-router.get("/:id",validateObjectId("id"),productController.getProductById);
-
 //Get suggestions
 router.get("/suggestions", productController.getProductSuggestions);
+
+//Get by id
+router.get("/:id",validateObjectId("id"),productController.getProductById);
 
 //Update
 router.put("/:id",protect,validateObjectId("id"),upload.array("images", 5),validate(updateProductSchema),productController.updateProduct);
