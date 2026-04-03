@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import * as authService from "./auth.service";
 import { asyncHandler } from "../../utils/asyncHandler";
+import {
+  accessTokenCookieOptions,
+  clearTokenCookieOptions,
+  refreshTokenCookieOptions,
+} from "../../config/cookie";
 
 export const signup =asyncHandler( async (req: Request, res: Response, next: NextFunction) => {
   
@@ -17,18 +22,8 @@ export const login =asyncHandler( async (req: Request, res: Response, next: Next
     const result = await authService.loginService(req.body);
 
     res
-  .cookie("accessToken", result.accessToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 15 * 60 * 1000 // 15 min
-  })
-  .cookie("refreshToken", result.refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-  })
+  .cookie("accessToken", result.accessToken, accessTokenCookieOptions)
+  .cookie("refreshToken", result.refreshToken, refreshTokenCookieOptions)
   .status(200)
   .json({
     success: true,
@@ -48,18 +43,8 @@ export const refreshToken =asyncHandler( async (req: Request, res: Response, nex
     const result = await authService.refreshTokenService(token);
 
     res
-  .cookie("accessToken", result.accessToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 15 * 60 * 1000 // 15 min
-  })
-  .cookie("refreshToken", result.refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-  })
+  .cookie("accessToken", result.accessToken, accessTokenCookieOptions)
+  .cookie("refreshToken", result.refreshToken, refreshTokenCookieOptions)
     res.status(200).json({
       success: true,
       message: "Token refreshed",
@@ -69,8 +54,8 @@ export const refreshToken =asyncHandler( async (req: Request, res: Response, nex
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "strict" });
-  res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "strict" });
+  res.clearCookie("accessToken", clearTokenCookieOptions);
+  res.clearCookie("refreshToken", clearTokenCookieOptions);
   
   res.status(200).json({
     success: true,

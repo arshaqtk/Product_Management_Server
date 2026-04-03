@@ -1,16 +1,21 @@
 import dotenv from "dotenv";
+import { z } from "zod";
+
 dotenv.config();
 
-export const env = {
-  MONGO_URI: process.env.MONGO_URI,
-  NODE_ENV: process.env.NODE_ENV,
-  PORT: process.env.PORT,
-  ACCESS_SECRET:process.env.ACCESS_SECRET,
-  REFRESH_SECRET:process.env.REFRESH_SECRET,
-  ACCESS_EXPIRES_IN:process.env.ACCESS_EXPIRES_IN,
-  REFRESH_EXPIRES_IN:process.env.REFRESH_EXPIRES_IN,
-  CLOUDINARY_CLOUD_NAME:process.env.CLOUDINARY_CLOUD_NAME,
-  CLOUDINARY_API_KEY:process.env.CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET:process.env.CLOUDINARY_API_SECRET,
-  CLIENT_URL:process.env.CLIENT_URL,
-};
+const envSchema = z.object({
+  MONGO_URI: z.string().min(1),
+  PORT: z.coerce.number().default(5000),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  ACCESS_SECRET: z.string().min(1),
+  REFRESH_SECRET: z.string().min(1),
+  ACCESS_EXPIRES_IN: z.string().min(1).default("15m"),
+  REFRESH_EXPIRES_IN: z.string().min(1).default("7d"),
+  CLOUDINARY_CLOUD_NAME: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1),
+  CLOUDINARY_API_SECRET: z.string().min(1),
+  CLIENT_URL: z.string().url(),
+  COOKIE_SAME_SITE: z.enum(["lax", "strict", "none"]).default("lax"),
+});
+
+export const env = envSchema.parse(process.env);
