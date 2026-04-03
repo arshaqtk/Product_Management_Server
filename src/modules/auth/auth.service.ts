@@ -30,7 +30,7 @@ export const loginService = async (data:loginSchema) => {
   const { email, password } = data;
 
   // Check if user exists
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("+password");
   if (!user) {
     throw new Error("Invalid credentials");
   }
@@ -43,7 +43,11 @@ export const loginService = async (data:loginSchema) => {
   const accessToken = generateAccessToken({ id: user._id.toString(),email:user.email });
   const refreshToken = generateRefreshToken({ id: user._id.toString(),email:user.email});
 
-  return { user, accessToken, refreshToken };
+  return { user:{
+    _id:user._id,
+name:user.name,
+email:user.email
+  }, accessToken, refreshToken };
 };
 
 export const refreshTokenService  = async (token:string)=>{
@@ -54,7 +58,11 @@ export const refreshTokenService  = async (token:string)=>{
   }
   const accessToken = generateAccessToken({ id: user._id.toString(),email:user.email });
   const refreshToken = generateRefreshToken({ id: user._id.toString(),email:user.email});
-  return { user, accessToken, refreshToken };
+  return { user:{
+    _id:user._id,
+name:user.name,
+email:user.email
+  }, accessToken, refreshToken };
 }
 
 export const getMeService = async (userId: string) => {
