@@ -1,114 +1,169 @@
-# Seclob Product Management Backend
+# Seclob Backend
 
-A robust Node.js/Express backend built with TypeScript, managing authentication, products, categories, and wishlists.
+TypeScript + Express backend for authentication, categories, products, and wishlists.
 
-## 🚀 Technologies
+## Stack
 
-- **Language**: TypeScript
-- **Framework**: Express.js
-- **Database**: MongoDB (via Mongoose)
-- **File Upload**: Multer + Cloudinary
-- **Authentication**: JWT (JSON Web Tokens) with Cookies
-- **Validation**: Zod
-- **Logging**: Morgan
+- TypeScript
+- Express
+- MongoDB with Mongoose
+- JWT auth with HTTP-only cookies
+- Zod validation
+- Cloudinary uploads via Multer
+- Morgan request logging
 
-## 📦 Features
+## Features
 
-- **Authentication**: Secure login/signup with password hashing and JWT-based session management.
-- **Category Management**: Hierarchical categories and subcategories.
-- **Product Management**: 
-    - Full CRUD operations.
-    - Advanced filtering (by category, subcategory, and text search).
-    - Variant support (e.g., RAM size, price, and stock per variant).
-    - Multi-image upload and hosting.
-- **Wishlist**: User-specific wishlist management (add/remove/fetch).
-- **Security**: CORS protection, cookie-based tokens, and global error handling.
+- User signup, login, logout, refresh, and current-user lookup
+- Category and subcategory management
+- Product creation, listing, search suggestions, detail view, and update
+- Wishlist add, remove, and fetch
+- Environment validation with Zod
+- Centralized auth cookie configuration
 
-## 🛠️ Getting Started
+## Prerequisites
 
-### Prerequisites
-
-- Node.js (v18+)
+- Node.js 18+
 - MongoDB connection string
-- Cloudinary credentials
+- Cloudinary account credentials
 
-### Installation
+## Installation
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-2. Configure environment variables (create a `.env` file):
-   ```env
-   PORT=5000
-   MONGO_URI=your_mongodb_uri
-   JWT_SECRET=your_jwt_secret
-   JWT_EXPIRE=7d
-   NODE_ENV=development
-   CLIENT_URL=http://localhost:5173
-   
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
-   ```
+## Environment Variables
 
-### Running the App
+Create `server/.env` with:
 
-- **Development**:
-  ```bash
-  npm run dev
-  ```
-- **Production Build**:
-  ```bash
-  npm run build
-  npm start
-  ```
+```env
+MONGO_URI=mongodb://localhost:27017/seclob
+PORT=5000
+NODE_ENV=development
 
-## 📡 API Routes
+ACCESS_SECRET=your_access_secret
+REFRESH_SECRET=your_refresh_secret
+ACCESS_EXPIRES_IN=15m
+REFRESH_EXPIRES_IN=7d
+
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+CLIENT_URL=http://localhost:5173
+COOKIE_SAME_SITE=lax
+```
+
+## Cookie Configuration
+
+Auth cookies are configured centrally in `src/config/cookie.ts`.
+
+- `COOKIE_SAME_SITE` must be one of `lax`, `strict`, or `none`
+- `secure` cookies are enabled automatically in production
+- if `COOKIE_SAME_SITE=none`, cookies are forced to `secure`
+
+Recommended values:
+
+- local development: `COOKIE_SAME_SITE=lax`
+- same-site production frontend/backend: `COOKIE_SAME_SITE=lax` or `strict`
+- cross-site production frontend/backend: `COOKIE_SAME_SITE=none`
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm start
+```
+
+## Run Locally
+
+Development:
+
+```bash
+npm run dev
+```
+
+Production build:
+
+```bash
+npm run build
+npm start
+```
+
+## API Base URL
+
+All routes are prefixed with:
+
+```text
+/api
+```
+
+## Routes
 
 ### Auth
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login user |
-| GET | `/api/auth/me` | Get current user (protected) |
-| POST | `/api/auth/logout` | Logout user |
 
-### Products
 | Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| GET | `/api/product` | Get all products (supports filters: search, categoryId, subcategory) |
-| GET | `/api/product/:id` | Get single product detail |
-| POST | `/api/product` | Create new product (Auth required) |
-| PUT | `/api/product/:id` | Update product (Auth required) |
-| DELETE | `/api/product/:id` | Delete product (Auth required) |
+| --- | --- | --- |
+| POST | `/api/auth/signup` | Register a new user |
+| POST | `/api/auth/login` | Log in and set auth cookies |
+| POST | `/api/auth/refresh` | Refresh access and refresh tokens |
+| POST | `/api/auth/logout` | Clear auth cookies |
+| GET | `/api/auth/me` | Get current authenticated user |
 
-### Categories
+### Category
+
 | Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| GET | `/api/category` | Get all categories and subcategories |
-| POST | `/api/category` | Create new category (Auth required) |
+| --- | --- | --- |
+| GET | `/api/category` | Fetch all categories |
+| POST | `/api/category` | Create a category |
+| POST | `/api/category/sub` | Add a subcategory to a category |
+| GET | `/api/category/:id` | Get subcategories for a category |
+
+### Product
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/product` | Fetch products with pagination and filters |
+| GET | `/api/product/suggestions` | Fetch search suggestions |
+| GET | `/api/product/:id` | Fetch product detail |
+| POST | `/api/product` | Create a product with images |
+| PUT | `/api/product/:id` | Update a product |
 
 ### Wishlist
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| GET | `/api/wishlist` | Get user's wishlist (Auth required) |
-| POST | `/api/wishlist` | Add item to wishlist (Auth required) |
-| DELETE | `/api/wishlist/:productId` | Remove item from wishlist (Auth required) |
 
-## 🏗️ Project Structure
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/wishlist` | Fetch the authenticated user's wishlist |
+| POST | `/api/wishlist` | Add a product to wishlist |
+| DELETE | `/api/wishlist/:productId` | Remove a product from wishlist |
+
+## Project Structure
 
 ```text
 src/
-├── config/         # Database and Environment configs
-├── middlewares/    # Custom middlewares (auth, error, upload)
-├── modules/        # Domain logic (Auth, Product, Category, Wishlist)
-│   ├── controller.ts
-│   ├── model.ts
-│   ├── routes.ts
-│   └── service.ts
-├── utils/          # Utility functions
-├── app.ts          # Express app configuration
-└── server.ts       # Entry point
+|-- config/
+|   |-- cloudinary.ts
+|   |-- cookie.ts
+|   |-- db.ts
+|   `-- env.ts
+|-- middlewares/
+|-- modules/
+|   |-- auth/
+|   |-- category/
+|   |-- product/
+|   `-- wishlist/
+|-- types/
+|-- utils/
+|-- validators/
+|-- app.ts
+`-- server.ts
 ```
+
+## Notes
+
+- CORS is restricted to `CLIENT_URL` and uses credentials
+- Product image uploads go through Cloudinary
+- Request logging is enabled in development only
+- Backend config is validated during startup, so missing required env vars will fail fast
